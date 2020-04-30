@@ -1,0 +1,42 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Log In
+{% endblock %}
+
+{% block main %}
+    <form action="/register" method="post">
+        <h4>User Information</h4>
+        <div class="form-group">
+            <input autocomplete="off" autofocus class="form-control" name="username" placeholder="Username" type="text" required>
+        </div>
+        <div class="form-group">
+            <input class="form-control" name="password" placeholder="Password" type="password" required>
+        </div>
+        <div class="form-group">
+            <input class="form-control" name="confirmation" placeholder="Password (again)" type="password" required>  
+        </div>
+        <div class="form-group">
+            <span>Birthday: </span><input class="form-control" name="birthday" min="1950-01-01" max="2020-05-01" type="date" required>
+        </div>
+
+        <h4>Set your IPPT Goals</h4>
+        <strong>Push Up:</strong>
+        <div class="form-group">
+            <input class="form-control" name="pushup" min="1" type="number" required>
+        </div>
+        <strong>Sit Up:</strong>
+        <div class="form-group">
+            <input class="form-control" name="situp" min="1" type="number" required>
+        </div>
+        <strong>2.4KM Run: </strong>
+        <div class="form-group">
+            <!-- Split the minutes and second up to simulate duration input-->
+            <input class="form-control" name="min" min="0" max="60" placeholder="MM" type="number" required>
+            :
+            <input class="form-control" name="sec" min="0" max="60" placeholder="SS" type="number" required>
+        </div>
+
+        <button class="btn btn-primary" type="submit">Register</button>
+    </form>
+{% endblock %}

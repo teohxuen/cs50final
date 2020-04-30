@@ -5,15 +5,14 @@ open(f"fitness.db", "w").close()
 db = SQL("sqlite:///fitness.db")
 
 #create the tables
-db.execute("CREATE TABLE 'user' (\
+db.execute("CREATE TABLE 'users' (\
 	'id'	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,\
 	'name'	TEXT NOT NULL,\
 	'birthday'	datetime NOT NULL,\
 	'pushup'	INTEGER NOT NULL,\
-	'situp'	BLOB NOT NULL,\
+	'situp'	INTEGER NOT NULL,\
 	'run'	datetime NOT NULL,\
-	'username'	TEXT,\
-	'hash'	TEXT)")
+	'hash'	TEXT NOT NULL)")
 
 db.execute('CREATE TABLE "ippt" (\
 	"id"	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,\
