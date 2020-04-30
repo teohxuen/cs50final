@@ -49,16 +49,20 @@ def index():
     if request.method == "GET":
         # TODO INSERT MOTIVATIONAL QUOTE
         # TODO INSERT X short of COMPLETING  goal for Y
-        
 
-        exercise = db.execute("SELECT name FROM exercises WHERE userid = :userid",
+        exercise = db.execute("SELECT name, id FROM exercises WHERE userid = :userid",
                                 userid=session["user_id"])
         # if users have no exercise they are redireced to the page to add new exercise
         if len(exercise) == 0:
             return redirect("/new")
         return render_template("index.html", exercise=exercise)
     else:
-        # TODO process the input
+        # HTML ensures that at least a count is chosen
+        
+        db.execute("INSERT INTO history (exerciseid, userid, count, notes)\
+                    VALUES (:exerciseid, :userid, :count, :notes)",
+                    exerciseid=request.form.get("name"), userid=session["user_id"],
+                    count=request.form.get("count"), notes=request.form.get("note"))
         return redirect("/")
 
 @app.route("/new", methods=["GET","POST"])
