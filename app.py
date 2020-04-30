@@ -43,10 +43,39 @@ Session(app)
 # Configure CS50 Library to use SQLite database
 db = SQL("sqlite:///fitness.db")
 
-@app.route("/")
+@app.route("/", methods=["GET","POST"])
 @login_required
 def index():
-    return render_template("index.html")
+    if request.method == "GET":
+        # TODO INSERT MOTIVATIONAL QUOTE
+        # TODO INSERT X short of COMPLETING  goal for Y
+        
+
+        exercise = db.execute("SELECT name FROM exercises WHERE userid = :userid",
+                                userid=session["user_id"])
+        # if users have no exercise they are redireced to the page to add new exercise
+        if len(exercise) == 0:
+            return redirect("/new")
+        return render_template("index.html", exercise=exercise)
+    else:
+        # TODO process the input
+        return redirect("/")
+
+@app.route("/new", methods=["GET","POST"])
+@login_required
+def new():
+    if request.method == "GET":
+        return render_template("new.html")
+    else:
+        # HTML ensures all field are filled in
+        # HTML ensures that date chosen is not before the present date
+        db.execute("INSERT INTO exercises (name, desc, target, date, userid)\
+                    VALUES (:name, :desc, :target, :date, :userid)",
+                    name=request.form.get("name"), desc=request.form.get("desc"),
+                    target=request.form.get("count"), date=request.form.get("date"),
+                    userid=session["user_id"])
+        return redirect("/")
+
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -78,21 +107,25 @@ def login():
 
 
 @app.route("/goals", methods=["GET","POST"])
+@login_required
 def goals():
     return TODO
 
 
 @app.route("/stats")
+@login_required
 def stats():
     return TODO
 
 
 @app.route("/history")
+@login_required
 def history():
     return TODO
 
 
 @app.route("/ippt", methods=["GET", "POST"])
+@login_required
 def ippt():
     return TODO
 

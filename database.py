@@ -22,7 +22,7 @@ db.execute('CREATE TABLE "ippt" (\
 	"situp"	INTEGER NOT NULL,\
 	"run"	datetime NOT NULL,\
 	"notes"	TEXT,\
-	FOREIGN KEY("userid") REFERENCES "user"("id"))')
+	FOREIGN KEY("userid") REFERENCES "users"("id"))')
 
 db.execute('CREATE TABLE "history" (\
 	"id"	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,\
@@ -30,16 +30,15 @@ db.execute('CREATE TABLE "history" (\
 	"userid"	INTEGER NOT NULL,\
 	"count"	REAL NOT NULL,\
 	"notes"	TEXT,\
-	"time"	datetime NOT NULL,\
+	"time"	datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,\
 	FOREIGN KEY("exerciseid") REFERENCES "exercises"("id"),\
-	FOREIGN KEY("userid") REFERENCES "user"("id"))')
+	FOREIGN KEY("userid") REFERENCES "users"("id"))')
 
 db.execute('CREATE TABLE "exercises" (\
 	"id"	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,\
 	"name"	TEXT NOT NULL,\
 	"desc"	TEXT,\
 	"userid"	INTEGER NOT NULL,\
-	"target"	REAL NOT NULL,\
-	"date"	datetime NOT NULL,\
-	"favourite"	BLOB NOT NULL,\
-	FOREIGN KEY("userid") REFERENCES "user"("id"))')
+	"target"	REAL,\
+	"date"	datetime,\
+	FOREIGN KEY("userid") REFERENCES "users"("id"))')

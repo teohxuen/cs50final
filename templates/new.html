@@ -1,0 +1,53 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    New Exercise
+{% endblock %}
+
+{% block main %}
+    <h3> Add a New Exercise</h3>
+    <form action="/new" method="post">
+
+        <strong> Exercise Name</strong>
+        <div class="form-group">
+            <input class="form-control" name="name" placeholder="Exercise Name" type="text" required>
+        </div>
+
+        <strong> Description</strong>
+        <div class="form-group">
+            <textarea class="form-control" name="desc" placeholder="Short description of the exercise" type="text" rows="3"></textarea>
+        </div>
+
+        <strong>Target</strong>
+        <div class="form-group">
+            <input class="form-control" min="0.01" step="0.01" name="count" placeholder="Target Count/Distance" type="number">
+        </div>       
+
+        <strong>Achieve Target by:</strong>
+        <div class="form-group">
+            <input class="form-control" id=datefield name="date" max="2030-05-01" type="date">
+        </div>
+
+        <button class="btn btn-primary" type="submit">Add Exercise</button>
+    </form>
+
+    <script>
+        // from https://stackoverflow.com/questions/32378590/set-date-input-fields-max-date-to-today
+        var today = new Date();
+        var dd = today.getDate();
+        var mm = today.getMonth()+1; //January is 0!
+        var yyyy = today.getFullYear();
+        if(dd<10){
+                dd='0'+dd
+            } 
+        if(mm<10){
+            mm='0'+mm
+        } 
+    
+        today = yyyy+'-'+mm+'-'+dd;
+        console.log(today)
+        document.getElementById("datefield").setAttribute("min", today);
+    </script>
+
+
+{% endblock %}
