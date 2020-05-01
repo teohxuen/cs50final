@@ -10,11 +10,7 @@ Fitness60 is a web app that tracks your work outs, your IPPT results and your lo
     * INSERT X short of COMPLETING  goal for Y
 
 * Goals Page
-    * A table to show the goals
     * A form to update the goals
-
-* History page
-    * Format time to current time zone
 
 * IPPT page
     * Table to show past IPPT result
@@ -24,5 +20,4 @@ Fitness60 is a web app that tracks your work outs, your IPPT results and your lo
 
 
 ## Built with
-
-Python3, Flask, SQLite3
+Python3, Flask, CS50's SQL module

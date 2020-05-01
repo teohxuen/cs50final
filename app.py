@@ -140,8 +140,26 @@ def login():
 @app.route("/goals", methods=["GET","POST"])
 @login_required
 def goals():
-    return TODO
-
+    if request.method == "GET":
+        # Select all the exercise from this user
+        exercise = db.execute("SELECT * FROM exercises WHERE userid = :userid",
+                            userid=session["user_id"])
+        for row in exercise:
+            if row["target"] != "":
+                row["target"] = convert(row["target"])
+            # check if target date is empty
+            if row["date"] != "":
+                # if target date is not empty formate the date
+                temp = datetime.strptime(row["date"],"%Y-%m-%d")
+                row["date"] = temp.strftime("%d %b %Y")
+        return render_template("goals.html", exercise=exercise, today=today)
+    
+    else:
+        db.execute("UPDATE exercises SET target = :target, date= :date WHERE id= :id",
+                    target=request.form.get("target"), date = request.form.get("date"),
+                    id=request.form.get("name"))
+        flash("Your goal is updated! Kepp working to hit your goals!")
+        return redirect("/goals")
 
 @app.route("/stats")
 @login_required
@@ -174,11 +192,11 @@ def stats():
             # if target date is not left blank
             if row["date"] !="":
                 # get the target date set
-                tempdate = row["date"].split("-")
-                tdate = date(int(tempdate[0]), int(tempdate[1]), int(tempdate[2]))
-                today = date.today()
+                tdate = datetime.strptime(row["date"],"%Y-%m-%d")
+                today = datetime.today()
                 # find out how many days are between target date and today
                 row["tdiff"] = (tdate-today).days
+                row["date"] = tdate.strftime("%d %b %Y")
                 
                 # if the difference is negative (yet to hit target)
                 if row["diff"] < 0:
@@ -187,7 +205,11 @@ def stats():
                         row["gpd"] = abs(row["diff"])
                     else:
                         # find out how many count per day to hit target
-                        row["gpd"] = abs(round(row["diff"]/row["tdiff"],2))
+                        row["gpd"] = abs(convert(row["diff"]/row["tdiff"]))
+        # user did not have a target count but has a target date
+        elif row["date"] != "":
+            tdate = datetime.strptime(row["date"],"%Y-%m-%d")
+            row["date"] = tdate.strftime("%d %b %Y")
 
     flash("Click on Fitness60 to add more workouts! Get Moving!")
     return render_template("stats.html", data=data)
@@ -221,7 +243,7 @@ def history():
         row["date"] = f"{temptime[0]} {temptime[1]} {temptime[2]}, {temptime[3]}"
         row["time"] = f"{temptime[4]}:{temptime[5]}{temptime[6]}"
 
-
+    flash("Click on Fitness60 to add more workouts! Get Moving!")
     return render_template("history.html", data = data)
 
 

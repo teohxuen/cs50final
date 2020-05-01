@@ -20,8 +20,13 @@ def login_required(f):
 
 
 def convert(num):
+    # if num is string change it to a float
     if type(num) == str:
-        num = round(float(num),2)
+        num = float(num)
+    # if num is a whole number conver it to an integer
     if num.is_integer():
         num = int(num)
+    # if num is a float, round it to 2dp
+    else:
+        num = round(num,2)
     return num

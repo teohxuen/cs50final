@@ -1,0 +1,59 @@
+{% extends "layout.html" %}
+
+{% block head %}
+    <style>
+        td
+        {
+            width: 20%;
+        }
+    </style>
+{% endblock %}
+
+{% block title %}
+    History
+{% endblock %}
+
+{% block main %}
+    <h3>Add or Update your Goals!</h3>
+    <form action="/goals" method="post">
+        <div class="form-group">
+            <select class="form-control" name="name">
+                {% for row in exercise %}
+                <option value="{{ row['id'] }}">{{ row["name"] }}</option>
+                {% endfor %}
+            </select> 
+        </div>
+
+        <strong>Goal</strong>
+        <div class="form-group">
+            <input class="form-control" min="0.01" step="0.01" name="target" placeholder="Count/Distance" type="number">
+        </div>
+        <strong>Goal Date</strong> 
+        <div class="form-group">
+            <input class="form-control" name="date" min="{{ today }}" max="2030-05-01" type="date">
+        </div>
+
+        <button class="btn btn-primary" type="submit">Add/Update Goals</button>
+    </form>
+
+    <p></p>
+    <h3>Goals Table</h3>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">Exercise</th>
+                <th scope="col">Goal</th>
+                <th scope="col">Goal Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in exercise %}
+            <tr>
+                <td>{{ row["name"] }}</td>
+                <td>{{ row["target"] }}</td>
+                <td>{{ row["date"] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
