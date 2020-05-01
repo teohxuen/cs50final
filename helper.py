@@ -19,3 +19,9 @@ def login_required(f):
     return decorated_function
 
 
+def convert(num):
+    if type(num) == str:
+        num = round(float(num),2)
+    if num.is_integer():
+        num = int(num)
+    return num

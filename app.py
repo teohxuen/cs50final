@@ -5,8 +5,8 @@ from flask_session import Session
 from tempfile import mkdtemp
 from werkzeug.exceptions import default_exceptions, HTTPException, InternalServerError
 from werkzeug.security import check_password_hash, generate_password_hash
-
-from helper import login_required
+from datetime import date
+from helper import login_required, convert
 
 # Configure application
 app = Flask(__name__)
@@ -131,7 +131,51 @@ def goals():
 @app.route("/stats")
 @login_required
 def stats():
-    return TODO
+    # get the total number of work out this userid
+    
+    data = db.execute("SELECT id, name, target, date FROM exercises WHERE userid = :userid",
+                        userid = session["user_id"])
+
+    if len(data) == 0:
+        # if users have no exercise added, it alerts the user on how he can add it
+        flash(" You current have no exercises added! Get moving! Click on 'New Exercise' to add a new exercise")
+
+    for row in data:
+        temp = db.execute("SELECT SUM(count) FROM history WHERE exerciseid = :exerciseid",
+                            exerciseid=row["id"])
+        print(row,temp)
+        # if user have done no work out for that particular exercise
+        if temp[0]["SUM(count)"] == None:
+            # set his count to 0
+            row["count"] = 0
+        else:
+            row["count"] = convert(temp[0]["SUM(count)"])
+
+        # if users have a target set
+        if row["target"] != "":
+            # find difference between current count and target
+            row["diff"] = row["count"] - float(row["target"])
+            row["diff"] = convert(row["diff"])
+            row["target"] = convert(row["target"])
+            # if target date is not left blank
+            if row["date"] !="":
+                # get the target date set
+                tempdate = row["date"].split("-")
+                tdate = date(int(tempdate[0]), int(tempdate[1]), int(tempdate[2]))
+                today = date.today()
+                # find out how many days are between target date and today
+                row["tdiff"] = (tdate-today).days
+                
+                # if the difference is negative (yet to hit target)
+                if row["diff"] < 0:
+                    # if days left is 0
+                    if row["tdiff"] == 0:
+                        row["gpd"] = abs(row["diff"])
+                    else:
+                        # find out how many count per day to hit target
+                        row["gpd"] = abs(round(row["diff"]/row["tdiff"],2))
+
+    return render_template("stats.html", data=data)
 
 
 @app.route("/history")
@@ -155,8 +199,7 @@ def history():
         row["name"] = temp[0]["name"]
 
         # convert the count to integer if the count is a whole number
-        if row["count"].is_integer():
-            row["count"] = int(row["count"])
+        row["count"] = convert(row["count"])
 
     return render_template("history.html", data = data)
 

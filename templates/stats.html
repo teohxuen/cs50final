@@ -1,0 +1,43 @@
+{% extends "layout.html" %}
+
+{% block head %}
+    <style>
+        td
+        {
+            width: 10%;
+        }
+    </style>
+{% endblock %}
+
+{% block title %}
+    History
+{% endblock %}
+
+{% block main %}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">Exercises</th>
+                <th scope="col">Total</th>
+                <th scope="col">Target</th>
+                <th scope="col">Gap</th>
+                <th scope="col">Days Left</th>
+                <th scope="col">Gap per Day</th>
+                <th scope="col">Target Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in data %}
+            <tr>
+                <td>{{ row["name"] }}</td>
+                <td>{{ row["count"] }}</td>
+                <td>{{ row["target"] }}</td>
+                <td>{{ row["diff"] }}</td>
+                <td>{{ row["tdiff"] }}</td>
+                <td>{{ row["gpd"] }}</td>
+                <td>{{ row["date"] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
