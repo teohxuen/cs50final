@@ -5,9 +5,7 @@
 Fitness60 is a web app that tracks your work outs, your IPPT results and your long term goals.
 
 ## TODO List
-* Index Page
-    * X away from Y target
-
+* Make the quote and X away from Y neater
 * IPPT page
     * page to have a IPPT calculator
 

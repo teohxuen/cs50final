@@ -62,8 +62,23 @@ def index():
             # tell users that they have to add a new exercise
             flash("You currently have no exercises. Add an exercise!")
             return redirect("/new")
-            
-        return render_template("index.html", exercise=exercise)
+
+        # get a random exercise which has yet to reach the goal
+        random = db.execute("SELECT name,target, target-SUM(count) FROM\
+                            exercises LEFT JOIN history ON exercises.id = history.exerciseid\
+                            WHERE exercises.userid=:userid AND target !=''\
+                            GROUP BY exercises.id\
+                            HAVING target-SUM(count)>0 OR target-SUM(count) IS NULL\
+                            ORDER BY RANDOM() LIMIT 1", userid=session["user_id"])
+        # if there is a random exercise
+
+        if len(random) != 0:
+            if random[0]["target-SUM(count)"] == None:
+                random[0]["target-SUM(count)"] = random[0]["target"]
+            random[0]["target-SUM(count)"] = convert(random[0]["target-SUM(count)"])
+            random[0]["target"]=convert(random[0]["target"])
+
+        return render_template("index.html", exercise=exercise, random=random)
     else:
         # HTML ensures that at least a count is chosen
         

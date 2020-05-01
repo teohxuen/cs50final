@@ -5,6 +5,13 @@
 {% endblock %}
 
 {% block main %}
+    {% if random|length != 0 %}
+            <blockquote class="wp-block-quote"> 
+                <p>Your {{ random[0]["name"] }} is {{ random[0]["target-SUM(count)"] }} away from hitting its target of {{ random[0]["target"] }}!</p>
+                <cite>GET MOVING!</cite>
+            </blockquote>
+    {% endif %}
+
     <h3>Add a new workout!</h3>
     <form action="/" method="post">
         <div class="form-group">
