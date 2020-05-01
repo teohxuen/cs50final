@@ -17,7 +17,10 @@
         <tbody>
             {% for row in data %}
             <tr>
-                <td style="max-width: 100px">{{ row["time"] }}</td>
+                <td style="max-width: 100px">
+                    <span>{{ row["date"] }}</span></br>
+                    <span>{{ row["time"] }}</span>
+                </td>
                 <td>{{ row["name"] }}</td>
                 <td>{{ row["count"] }}</td>
                 <td style="text-align: left; max-width: 200px">{{ row["notes"] }}</td>

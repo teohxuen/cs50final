@@ -5,7 +5,7 @@ from flask_session import Session
 from tempfile import mkdtemp
 from werkzeug.exceptions import default_exceptions, HTTPException, InternalServerError
 from werkzeug.security import check_password_hash, generate_password_hash
-from datetime import date
+from datetime import date, datetime
 from helper import login_required, convert
 
 # Configure application
@@ -43,6 +43,10 @@ Session(app)
 # Configure CS50 Library to use SQLite database
 db = SQL("sqlite:///fitness.db")
 
+# get today date 
+today = date.today().isoformat()
+
+
 @app.route("/", methods=["GET","POST"])
 @login_required
 def index():
@@ -50,6 +54,7 @@ def index():
         # TODO INSERT MOTIVATIONAL QUOTE
         # TODO INSERT X short of COMPLETING  goal for Y
 
+        # Select all the exercise from this user
         exercise = db.execute("SELECT name, id FROM exercises WHERE userid = :userid",
                                 userid=session["user_id"])
         # if users have no exercise they are redireced to the page to add new exercise
@@ -62,25 +67,35 @@ def index():
     else:
         # HTML ensures that at least a count is chosen
         
+        time = datetime.now().strftime("%d %b %Y %A %I %M %p")
+
         # insert work out into exercise history
-        db.execute("INSERT INTO history (exerciseid, userid, count, notes)\
-                    VALUES (:exerciseid, :userid, :count, :notes)",
+        db.execute("INSERT INTO history (exerciseid, userid, count, notes, time)\
+                    VALUES (:exerciseid, :userid, :count, :notes, :time)",
                     exerciseid=request.form.get("name"), userid=session["user_id"],
-                    count=request.form.get("count"), notes=request.form.get("note"))
+                    count=request.form.get("count"), notes=request.form.get("note"),
+                    time = time)
         
         # return a message to indicate that work out has been added successfully
         flash("Work out added!")
         return redirect("/")
 
+
 @app.route("/new", methods=["GET","POST"])
 @login_required
 def new():
     if request.method == "GET":
-        return render_template("new.html")
+        return render_template("new.html", today=today)
     else:
         # HTML ensures all field are filled in
         # HTML ensures that date chosen is not before the present date
 
+        row = db.execute("SELECT * FROM exercises WHERE name = :name AND userid = :userid",
+                            name = request.form.get("name"), userid=session["user_id"])
+        # if the user has an exercise with the same name
+        if len(row) != 0:
+            return render_template("error.html",num=403,msg="You have already created an exercise with the same name", link="/new")
+        
         # insert new exercise to exercises database
         db.execute("INSERT INTO exercises (name, desc, target, date, userid)\
                     VALUES (:name, :desc, :target, :date, :userid)",
@@ -131,14 +146,13 @@ def goals():
 @app.route("/stats")
 @login_required
 def stats():
-    # get the total number of work out this userid
-    
+    # get the list of exercises under this userid
     data = db.execute("SELECT id, name, target, date FROM exercises WHERE userid = :userid",
                         userid = session["user_id"])
 
     if len(data) == 0:
         # if users have no exercise added, it alerts the user on how he can add it
-        flash(" You current have no exercises added! Get moving! Click on 'New Exercise' to add a new exercise")
+        flash("You current have no exercises added! Get moving! Click on 'New Exercise' to add a new exercise")
 
     for row in data:
         temp = db.execute("SELECT SUM(count) FROM history WHERE exerciseid = :exerciseid",
@@ -175,6 +189,7 @@ def stats():
                         # find out how many count per day to hit target
                         row["gpd"] = abs(round(row["diff"]/row["tdiff"],2))
 
+    flash("Click on Fitness60 to add more workouts! Get Moving!")
     return render_template("stats.html", data=data)
 
 
@@ -201,6 +216,12 @@ def history():
         # convert the count to integer if the count is a whole number
         row["count"] = convert(row["count"])
 
+        # Format the time
+        temptime = row["time"].split(" ")
+        row["date"] = f"{temptime[0]} {temptime[1]} {temptime[2]}, {temptime[3]}"
+        row["time"] = f"{temptime[4]}:{temptime[5]}{temptime[6]}"
+
+
     return render_template("history.html", data = data)
 
 
@@ -225,7 +246,7 @@ def logout():
 def register():
     """Register user"""
     if request.method == "GET":
-        return render_template("register.html")
+        return render_template("register.html", maxdate = today)
     else:
         # HTML checks if all fields are filled
         # Ensure password was submitted and the passwords match
@@ -245,7 +266,7 @@ def register():
         password = generate_password_hash(request.form.get("password"))
 
         # format 2.4 run time
-        run = "00:" + request.form.get("min") + ":" + request.form.get("sec")
+        run = f"{request.form.get('min')}:{request.form.get('sec')}"
 
         # insert the new user into the database
         db.execute("INSERT INTO users (name, birthday, pushup, situp, run, hash)\
@@ -254,5 +275,6 @@ def register():
                    pushup=request.form.get("pushup"), situp=request.form.get("situp"),
                    run=run, hash=password)        
 
+        flash("User registered! Please login.")
         # redirect users to the index page
         return redirect("/login")

@@ -10,7 +10,7 @@
         <div class="form-group">
             <select class="form-control" name="name">
                 {% for row in exercise %}
-                <option value={{ row["id"] }}>{{ row["name"] }}</option>
+                <option value="{{ row['id'] }}">{{ row["name"] }}</option>
                 {% endfor %}
             </select> 
         </div>
