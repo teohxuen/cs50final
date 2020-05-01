@@ -5,12 +5,11 @@
 Fitness60 is a web app that tracks your work outs, your IPPT results and your long term goals.
 
 ## TODO List
-* All Page
-    * INSERT MOTIVATIONAL QUOTE 
+* Index Page
+    * X away from Y target
 
 * IPPT page
     * page to have a IPPT calculator
-
 
 ## Built with
 Python3, Flask, CS50's SQL module
