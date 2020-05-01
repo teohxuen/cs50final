@@ -1,0 +1,83 @@
+{% extends "layout.html" %}
+
+{% block head %}
+    <style>
+        td
+        {
+            width: 20%;
+        }
+    </style>
+{% endblock %}
+
+{% block title %}
+    History
+{% endblock %}
+
+{% block main %}
+    <h3>Add a new IPPT result or Update your IPPT Goal</h3>
+    <form action="/ippt" method="post">
+
+        <strong>Test Date: </strong> 
+        <div class="form-group">
+            <input class="form-control" name="date" max="{{ today }}" min="2018-05-01" type="date">
+        </div>
+
+        <strong>Push Up: </strong>
+        <div class="form-group">
+            <input class="form-control" min="0" name="pushup" placeholder="Count/Distance" type="number" required>
+        </div>
+
+        <strong>Sit Up: </strong>
+        <div class="form-group">
+            <input class="form-control" min="0" name="situp" placeholder="Count/Distance" type="number" required>
+        </div>
+
+        <strong>2.4KM Run: </strong>
+        <div class="form-group">
+            <!-- Split the minutes and second up to simulate duration input-->
+            <input class="form-control" style="width: 12%;" name="min" min="0" max="60" placeholder="MM" type="number" required>
+            :
+            <input class="form-control" style="width: 12%;" name="sec" min="0" max="60" placeholder="SS" type="number" required>
+        </div>
+
+        <strong>Notes: </strong>
+        <div class="form-group">
+            <textarea class="form-control" name="notes" placeholder="Notes regarding the test" type="text" rows="3"></textarea>
+        </div>        
+
+        <button class="btn btn-primary" name="submit" value="add" type="submit">Add IPPT Result</button>
+        <button class="btn btn-primary" name="submit" value="update" type="submit">Update IPPT Goals</button>
+    </form>
+
+    <p></p>
+    <h3>IPPT Results</h3>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">Date</th>
+                <th scope="col">Push Up</th>
+                <th scope="col">Sit Up</th>
+                <th scope="col">2.4 KM Run</th>
+                <th scope="col">Notes</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Goal</strong></td>
+                <td><strong>{{ goal[0]["pushup"] }}</strong></td>
+                <td><strong>{{ goal[0]["situp"] }}</strong></td>
+                <td><strong>{{ goal[0]["run"] }}</strong></td>
+                <td><strong> </strong></td>
+            </tr>
+            {% for row in ippt %}
+            <tr>
+                <td>{{ row["date"] }}</td>
+                <td>{{ row["pushup"] }}</td>
+                <td>{{ row["situp"] }}</td>
+                <td>{{ row["run"] }}</td>
+                <td>{{ row["notes"] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

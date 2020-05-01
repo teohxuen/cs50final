@@ -17,7 +17,7 @@ db.execute("CREATE TABLE 'users' (\
 db.execute('CREATE TABLE "ippt" (\
 	"id"	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,\
 	"userid"	INTEGER NOT NULL,\
-	"date"	datetime NOT NULL,\
+	"date"	datetime,\
 	"pushup"	INTEGER NOT NULL,\
 	"situp"	INTEGER NOT NULL,\
 	"run"	datetime NOT NULL,\

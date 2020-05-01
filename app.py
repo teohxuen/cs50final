@@ -250,7 +250,39 @@ def history():
 @app.route("/ippt", methods=["GET", "POST"])
 @login_required
 def ippt():
-    return TODO
+    if request.method == "GET":
+        # get data from database
+        goal = db.execute("SELECT pushup,situp,run,birthday FROM users WHERE id= :userid",
+                            userid=session["user_id"])
+        ippt = db.execute("SELECT date,pushup,situp,run,notes FROM ippt WHERE userid= :userid ORDER BY date",
+                            userid=session["user_id"])
+
+        for row in ippt:
+            # if date is present formate the date nicely
+            if row["date"] != "":
+                tdate = datetime.strptime(row["date"],"%Y-%m-%d")
+                row["date"] = tdate.strftime("%d %b %Y")
+
+        return render_template("ippt.html", goal=goal, ippt=ippt)
+
+    else:
+        # format 2.4km run timing
+        run = f"{request.form.get('min')}:{request.form.get('sec')}"
+        # update IPPT goal
+        if request.form.get("submit") == "update":
+            db.execute("UPDATE users SET pushup=:pushup,situp=:situp,run=:run WHERE id=:userid",
+                        pushup=request.form.get("pushup"), situp=request.form.get("situp"), run=run,
+                        userid=session["user_id"])
+            flash("IPPT Goals Updated")
+        # add new ippt result
+        else:
+            db.execute("INSERT INTO ippt (userid,date,pushup,situp,run,notes)\
+                        VALUES (:userid, :date, :pushup, :situp, :run, :notes)",
+                        userid=session["user_id"], date=request.form.get("date"),
+                        pushup=request.form.get("pushup"), situp=request.form.get("situp"),
+                        run=run, notes=request.form.get("notes"))
+            flash("IPPT Added")
+        return redirect("/ippt")
 
 
 @app.route("/logout")
