@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    History
+{% endblock %}
+
+{% block main %}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">Date</th>
+                <th scope="col">Exercise</th>
+                <th scope="col">Count</th>
+                <th scope="col">Notes</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in data %}
+            <tr>
+                <td style="max-width: 100px">{{ row["time"] }}</td>
+                <td>{{ row["name"] }}</td>
+                <td>{{ row["count"] }}</td>
+                <td style="text-align: left; max-width: 200px">{{ row["notes"] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

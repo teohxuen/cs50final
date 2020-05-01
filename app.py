@@ -1,5 +1,5 @@
 from cs50 import SQL
-from flask import Flask, redirect, render_template, request, session
+from flask import Flask, redirect, render_template, request, session, flash
 from flask_session import Session
 # mkdtemp stores session in filesystem (?)
 from tempfile import mkdtemp
@@ -54,15 +54,22 @@ def index():
                                 userid=session["user_id"])
         # if users have no exercise they are redireced to the page to add new exercise
         if len(exercise) == 0:
+            # tell users that they have to add a new exercise
+            flash("You currently have no exercises. Add an exercise!")
             return redirect("/new")
+            
         return render_template("index.html", exercise=exercise)
     else:
         # HTML ensures that at least a count is chosen
         
+        # insert work out into exercise history
         db.execute("INSERT INTO history (exerciseid, userid, count, notes)\
                     VALUES (:exerciseid, :userid, :count, :notes)",
                     exerciseid=request.form.get("name"), userid=session["user_id"],
                     count=request.form.get("count"), notes=request.form.get("note"))
+        
+        # return a message to indicate that work out has been added successfully
+        flash("Work out added!")
         return redirect("/")
 
 @app.route("/new", methods=["GET","POST"])
@@ -73,11 +80,16 @@ def new():
     else:
         # HTML ensures all field are filled in
         # HTML ensures that date chosen is not before the present date
+
+        # insert new exercise to exercises database
         db.execute("INSERT INTO exercises (name, desc, target, date, userid)\
                     VALUES (:name, :desc, :target, :date, :userid)",
                     name=request.form.get("name"), desc=request.form.get("desc"),
                     target=request.form.get("count"), date=request.form.get("date"),
                     userid=session["user_id"])
+
+        # flash a message to indciate that new exercise has been added
+        flash("New exercise added!")            
         return redirect("/")
 
 
@@ -125,7 +137,28 @@ def stats():
 @app.route("/history")
 @login_required
 def history():
-    return TODO
+    # TODO Change the time to local timezone
+
+    # get all work out completed by this user_id
+    data = db.execute("SELECT time, count, notes, exerciseid FROM history WHERE\
+                        userid = :userid", userid=session["user_id"])
+
+    if len(data) == 0:
+        # if users have no work out recorded, it alerts the user on how he can add it
+        flash(" You current have no work out recorded! Get moving! Click on 'Fitness60' to add a new work out")
+
+    # for each work out
+    for row in data:
+        # get the name of the exercise
+        temp = db.execute("SELECT name FROM exercises WHERE id= :exerciseid",
+                            exerciseid = row["exerciseid"])
+        row["name"] = temp[0]["name"]
+
+        # convert the count to integer if the count is a whole number
+        if row["count"].is_integer():
+            row["count"] = int(row["count"])
+
+    return render_template("history.html", data = data)
 
 
 @app.route("/ippt", methods=["GET", "POST"])
