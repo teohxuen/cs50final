@@ -41,12 +41,9 @@ app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
 # Configure CS50 Library to use SQLite database
-# db = SQL("sqlite:///fitness.db")
-
-# To run on heroku
 db = SQL("sqlite:///fitness.db")
 
-# get today date 
+# get today's date 
 today = date.today().isoformat()
 
 
@@ -54,27 +51,25 @@ today = date.today().isoformat()
 @login_required
 def index():
     if request.method == "GET":
-        # TODO INSERT MOTIVATIONAL QUOTE
-        # TODO INSERT X short of COMPLETING  goal for Y
 
-        # Select all the exercise from this user
+        # Select all of this user's exercise
         exercise = db.execute("SELECT name, id FROM exercises WHERE userid = :userid",
                                 userid=session["user_id"])
-        # if users have no exercise they are redireced to the page to add new exercise
+        # if the user have no exercise they are redireced to the page to add new exercise
         if len(exercise) == 0:
             # tell users that they have to add a new exercise
             flash("You currently have no exercises. Add an exercise!")
             return redirect("/new")
 
-        # get a random exercise which has yet to reach the goal
+        # get a random exercise which the user has yet to reach his goal
         random = db.execute("SELECT name,target, target-SUM(count) FROM\
                             exercises LEFT JOIN history ON exercises.id = history.exerciseid\
                             WHERE exercises.userid=:userid AND target !=''\
                             GROUP BY exercises.id\
                             HAVING target-SUM(count)>0 OR target-SUM(count) IS NULL\
                             ORDER BY RANDOM() LIMIT 1", userid=session["user_id"])
+       
         # if there is a random exercise
-
         if len(random) != 0:
             if random[0]["target-SUM(count)"] == None:
                 random[0]["target-SUM(count)"] = random[0]["target"]
@@ -85,9 +80,10 @@ def index():
     else:
         # HTML ensures that at least a count is chosen
         
+        # Get the current time
         time = datetime.now().strftime("%d %b %Y %A %I %M %p")
 
-        # insert work out into exercise history
+        # insert work out into history database
         db.execute("INSERT INTO history (exerciseid, userid, count, notes, time)\
                     VALUES (:exerciseid, :userid, :count, :notes, :time)",
                     exerciseid=request.form.get("name"), userid=session["user_id"],
@@ -121,7 +117,7 @@ def new():
                     target=request.form.get("count"), date=request.form.get("date"),
                     userid=session["user_id"])
 
-        # flash a message to indciate that new exercise has been added
+        # flash a message to indicate that new exercise has been added
         flash("New exercise added!")            
         return redirect("/")
 
@@ -159,7 +155,7 @@ def login():
 @login_required
 def goals():
     if request.method == "GET":
-        # Select all the exercise from this user
+        # Select all of the user's exercises
         exercise = db.execute("SELECT * FROM exercises WHERE userid = :userid",
                             userid=session["user_id"])
         for row in exercise:
@@ -187,14 +183,14 @@ def stats():
                         userid = session["user_id"])
 
     if len(data) == 0:
-        # if users have no exercise added, it alerts the user on how he can add it
+        # if the user have no exercise added, it alerts the user on how he can add it
         flash("You current have no exercises added! Get moving! Click on 'New Exercise' to add a new exercise")
 
     for row in data:
         temp = db.execute("SELECT SUM(count) FROM history WHERE exerciseid = :exerciseid",
                             exerciseid=row["id"])
 
-        # if user have done no work out for that particular exercise
+        # if user have not completed any work out for that particular exercise
         if temp[0]["SUM(count)"] == None:
             # set his count to 0
             row["count"] = 0
@@ -209,7 +205,7 @@ def stats():
             row["target"] = convert(row["target"])
             # if target date is not left blank
             if row["date"] !="":
-                # get the target date set
+                # get the target date
                 tdate = datetime.strptime(row["date"],"%Y-%m-%d").date()
                 today = datetime.today().date()
                 # find out how many days are between target date and today
@@ -225,7 +221,7 @@ def stats():
                     else:
                         # find out how many count per day to hit target
                         row["gpd"] = abs(convert(row["diff"]/row["tdiff"]))
-        # user did not have a target count but has a target date
+        # if user did not have a target count but has a target date
         elif row["date"] != "":
             tdate = datetime.strptime(row["date"],"%Y-%m-%d")
             row["date"] = tdate.strftime("%d %b %Y")
@@ -237,14 +233,12 @@ def stats():
 @app.route("/history")
 @login_required
 def history():
-    # TODO Change the time to local timezone
-
     # get all work out completed by this user_id
     data = db.execute("SELECT time, count, notes, exerciseid FROM history WHERE\
                         userid = :userid", userid=session["user_id"])
 
     if len(data) == 0:
-        # if users have no work out recorded, it alerts the user on how he can add it
+        # if user have no work out recorded, it alerts the user on how he can add it
         flash(" You current have no work out recorded! Get moving! Click on 'Fitness60' to add a new work out")
 
     # for each work out
@@ -278,15 +272,15 @@ def ippt():
 
         # get today date
         today = date.today()
-        # formate the date nicely and convert it to date formate
+        # format the birth date nicely and convert it to python's date format
         born = datetime.strptime(goal[0]["birthday"],"%Y-%m-%d").date()
-        # if today date (w/o year) is before the date of the birthday date (w/o) logical expression will return 1
-        # so it will subtact 1 else it will not subtact one more
+        # if today's date (w/o year) is before the date of the birthday (w/o year) the logical expression will return 1
+        # so it will subtact 1 
         # idea from https://stackoverflow.com/questions/2217488/age-from-birthdate-in-python
         age = today.year - born.year - ((today.month, today.day) < (born.month, born.day))
 
         for row in ippt:
-            # if date is present formate the date nicely
+            # if date is present format the date nicely
             if row["date"] != "":
                 tdate = datetime.strptime(row["date"],"%Y-%m-%d")
                 row["date"] = tdate.strftime("%d %b %Y")
