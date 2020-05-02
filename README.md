@@ -38,17 +38,20 @@ Logs the user out and clear the users sessions
 ## Files in this repository
 app.py
 * Runs the web app
+
 database.py
 * Create the databse for this web app
+
 helper.py
 * Includes the helper functions
+
 /static
 * Contains favicon for the webpage
 * JS to calculate the IPPT score
 * CSS File
+
 /templates
 * All the HTML pages
-
 
 
 ## Built with
