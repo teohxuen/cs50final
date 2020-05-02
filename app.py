@@ -167,7 +167,7 @@ def goals():
                 row["target"] = convert(row["target"])
             # check if target date is empty
             if row["date"] != "":
-                # if target date is not empty formate the date
+                # if target date is not empty format the date
                 temp = datetime.strptime(row["date"],"%Y-%m-%d")
                 row["date"] = temp.strftime("%d %b %Y")
         return render_template("goals.html", exercise=exercise, today=today)
@@ -193,7 +193,7 @@ def stats():
     for row in data:
         temp = db.execute("SELECT SUM(count) FROM history WHERE exerciseid = :exerciseid",
                             exerciseid=row["id"])
-        print(row,temp)
+
         # if user have done no work out for that particular exercise
         if temp[0]["SUM(count)"] == None:
             # set his count to 0
@@ -210,10 +210,11 @@ def stats():
             # if target date is not left blank
             if row["date"] !="":
                 # get the target date set
-                tdate = datetime.strptime(row["date"],"%Y-%m-%d")
-                today = datetime.today()
+                tdate = datetime.strptime(row["date"],"%Y-%m-%d").date()
+                today = datetime.today().date()
                 # find out how many days are between target date and today
                 row["tdiff"] = (tdate-today).days
+
                 row["date"] = tdate.strftime("%d %b %Y")
                 
                 # if the difference is negative (yet to hit target)
@@ -283,7 +284,6 @@ def ippt():
         # so it will subtact 1 else it will not subtact one more
         # idea from https://stackoverflow.com/questions/2217488/age-from-birthdate-in-python
         age = today.year - born.year - ((today.month, today.day) < (born.month, born.day))
-        print(age)
 
         for row in ippt:
             # if date is present formate the date nicely
@@ -291,7 +291,7 @@ def ippt():
                 tdate = datetime.strptime(row["date"],"%Y-%m-%d")
                 row["date"] = tdate.strftime("%d %b %Y")
 
-        return render_template("ippt.html", goal=goal, ippt=ippt, age=age)
+        return render_template("ippt.html", goal=goal, ippt=ippt, age=age, today=today)
 
     else:
         # format 2.4km run timing
@@ -300,7 +300,7 @@ def ippt():
         if int(sec) == 0:
             sec = "00"
         else:
-            sec = sec.lstrip(0)
+            sec = sec.lstrip("0")
         run = f"{min}:{sec}"
         # update IPPT goal
         if request.form.get("submit") == "update":
