@@ -44,7 +44,7 @@ Session(app)
 # db = SQL("sqlite:///fitness.db")
 
 # To run on heroku
-db = SQL("***REMOVED***")
+db = SQL("sqlite:///fitness.db")
 
 # get today date 
 today = date.today().isoformat()
