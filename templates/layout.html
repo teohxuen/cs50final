@@ -18,6 +18,12 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
 
+        <!-- https://favicon.io/favicon-generator/ -->
+        <link rel="apple-touch-icon" sizes="180x180" href="static/apple-touch-icon.png">
+        <link rel="icon" type="image/png" sizes="32x32" href="static/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="static/favicon-16x16.png">
+        <link rel="manifest" href="static/site.webmanifest">
+
         {% block head %}{% endblock %}
         <script>
             fetch("https://type.fit/api/quotes")
@@ -82,16 +88,16 @@
             </header>
         {% endif %}
         
-        <blockquote class="wp-block-quote">
-            <p id="quote"></p>
-            <cite id="author"></cite>
-        </blockquote>
 
         <main class="container p-5">
             {% block main %}{% endblock %}
         </main>
 
         <footer class="small text-center text-muted">
+            <blockquote class="wp-block-quote">
+                <p id="quote"></p>
+                <cite id="author"></cite>
+            </blockquote>
             Quotes provided by <a href="https://type.fit/api/quotes">type.fit</a>.
         </footer>
 

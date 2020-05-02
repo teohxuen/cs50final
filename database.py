@@ -21,6 +21,7 @@ db.execute('CREATE TABLE "ippt" (\
 	"pushup"	INTEGER NOT NULL,\
 	"situp"	INTEGER NOT NULL,\
 	"run"	datetime NOT NULL,\
+	"score" TEXT,\
 	"notes"	TEXT,\
 	FOREIGN KEY("userid") REFERENCES "users"("id"))')
 
