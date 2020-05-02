@@ -356,7 +356,7 @@ def register():
         if int(sec) == 0:
             sec = "00"
         else:
-            sec = sec.lstrip(0)
+            sec = sec.lstrip("0")
         run = f"{min}:{sec}"
 
         # insert the new user into the database
@@ -369,3 +369,14 @@ def register():
         flash("User registered! Please login.")
         # redirect users to the index page
         return redirect("/login")
+
+def errorhandler(e):
+    """Handle error"""
+    if not isinstance(e, HTTPException):
+        e = InternalServerError()
+    return render_template("error.html", msg=e.name, num=e.code)
+
+
+# Listen for errors
+for code in default_exceptions:
+    app.errorhandler(code)(errorhandler)
